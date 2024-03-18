@@ -6,7 +6,7 @@ const createUser = async (req, res) => {
     const { name, email, password, confirmPassword, phone } = req.body;
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const isCheckEmail = reg.test(email);
-    if (!name || !email || !password || !confirmPassword || !phone) {
+    if (!email || !password || !confirmPassword) {
       return res.status(200).json({
         status: "ERR",
         message: "All fields are required",
@@ -33,10 +33,10 @@ const createUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { name, email, password, confirmPassword, phone } = req.body;
+    const { email, password } = req.body;
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const isCheckEmail = reg.test(email);
-    if (!name || !email || !password || !confirmPassword || !phone) {
+    if (!email || !password) {
       return res.status(200).json({
         status: "ERR",
         message: "All fields are required",
@@ -46,14 +46,15 @@ const loginUser = async (req, res) => {
         status: "ERR",
         message: "Invalid email",
       });
-    } else if (password !== confirmPassword) {
-      return res.status(200).json({
-        status: "ERR",
-        message: "Password and confirm password are not match",
-      });
     }
     const response = await UserService.loginUser(req.body);
-    return res.status(200).json(response);
+    const { refresh_token, ...newResponse } = response;
+    // console.log("response", response);
+    res.cookie("refresh_token", refresh_token, {
+      httpOnly: true,
+      Secure: true,
+    });
+    return res.status(200).json(newResponse);
   } catch (e) {
     return res.status(404).json({
       message: `Controller: ${e}`,
@@ -129,7 +130,7 @@ const getDetailsUser = async (req, res) => {
 
 const refreshToken = async (req, res) => {
   try {
-    const token = req.headers.token?.split(" ")[1];
+    const token = req.cookies.refresh_token;
     if (!token) {
       return res.status(200).json({
         status: "ERR",
@@ -138,6 +139,7 @@ const refreshToken = async (req, res) => {
     }
     const response = await JwtService.refreshTokenJwtService(token);
     return res.status(200).json(response);
+    return;
   } catch (e) {
     return res.status(404).json({
       message: `Controller: ${e}`,

@@ -10,7 +10,7 @@ const createUser = (newUser) => {
       const checkUser = await User.findOne({ email });
       if (checkUser !== null) {
         resolve({
-          status: "OK",
+          status: "ERR",
           message: "Email already exists",
         });
       }
@@ -36,19 +36,19 @@ const createUser = (newUser) => {
 
 const loginUser = (userLogin) => {
   return new Promise(async (resolve, reject) => {
-    const { name, email, password, confirmPassword, phone } = userLogin;
+    const { email, password } = userLogin;
     try {
       const checkUser = await User.findOne({ email });
       if (checkUser === null) {
         resolve({
-          status: "OK",
+          status: "ERR",
           message: "User not found",
         });
       }
       const comparePassword = bcrypt.compareSync(password, checkUser.password);
       if (!comparePassword) {
         resolve({
-          status: "OK",
+          status: "ERR",
           message: "The password is incorrect",
         });
       }
