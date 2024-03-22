@@ -149,6 +149,21 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const logoutUser = async (req, res) => {
+  console.log("req.cookies.refresh_token: ", req.cookies.refresh_token);
+  try {
+    res.clearCookie("refresh_token");
+    return res.status(200).json({
+      status: "OK",
+      message: "Logout successfully",
+    });
+  } catch (e) {
+    return res.status(404).json({
+      message: `Controller: ${e}`,
+    });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -157,4 +172,5 @@ module.exports = {
   getAllUser,
   getDetailsUser,
   refreshToken,
+  logoutUser,
 };
