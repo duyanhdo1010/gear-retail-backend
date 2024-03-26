@@ -12,6 +12,8 @@ const port = process.env.PORT || 3001;
 
 // dung de cho phep cac domain khac co the truy cap vao server
 app.use(cors());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 // dung de cho phep truy cap vao cac file static
 app.use(bodyParser.json());

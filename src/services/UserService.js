@@ -144,6 +144,7 @@ const getDetailsUser = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const user = await User.findOne({ _id: id });
+      console.log("user: ", user);
       if (user === null) {
         resolve({
           status: "OK",
