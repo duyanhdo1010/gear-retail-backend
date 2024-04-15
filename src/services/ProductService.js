@@ -1,5 +1,5 @@
-const Product = require("../models/ProductModel");
-const bcrypt = require("bcrypt");
+const Product = require('../models/ProductModel');
+const bcrypt = require('bcrypt');
 
 const createProduct = (newProduct) => {
   return new Promise(async (resolve, reject) => {
@@ -10,8 +10,8 @@ const createProduct = (newProduct) => {
       const checkProduct = await Product.findOne({ name: name });
       if (checkProduct !== null) {
         resolve({
-          status: "OK",
-          message: "Product already exists",
+          status: 'OK',
+          message: 'Product already exists',
         });
       }
       const newProduct = await Product.create({
@@ -25,8 +25,8 @@ const createProduct = (newProduct) => {
       });
       if (newProduct) {
         resolve({
-          status: "OK",
-          message: "Product created successfully",
+          status: 'OK',
+          message: 'Product created successfully',
           data: newProduct,
         });
       }
@@ -42,8 +42,8 @@ const updateProduct = (id, data) => {
       const checkProduct = await Product.findOne({ _id: id });
       if (checkProduct === null) {
         resolve({
-          status: "OK",
-          message: "Product not found",
+          status: 'OK',
+          message: 'Product not found',
         });
       }
 
@@ -51,8 +51,8 @@ const updateProduct = (id, data) => {
         new: true,
       });
       resolve({
-        status: "OK",
-        message: "Product updated successfully",
+        status: 'OK',
+        message: 'Product updated successfully',
         data: updatedProduct,
       });
       // }
@@ -68,13 +68,13 @@ const getDetailsProduct = (id) => {
       const product = await Product.findOne({ _id: id });
       if (product === null) {
         resolve({
-          status: "OK",
-          message: "Product not found",
+          status: 'OK',
+          message: 'Product not found',
         });
       }
       resolve({
-        status: "OK",
-        message: "SUCCESS",
+        status: 'OK',
+        message: 'SUCCESS',
         data: product,
       });
       // }
@@ -90,15 +90,30 @@ const deleteProduct = (id) => {
       const checkProduct = await Product.findOne({ _id: id });
       if (checkProduct === null) {
         resolve({
-          status: "OK",
-          message: "Product not found",
+          status: 'OK',
+          message: 'Product not found',
         });
       }
 
       await Product.findByIdAndDelete(id);
       resolve({
-        status: "OK",
-        message: "Product deleted",
+        status: 'OK',
+        message: 'Product deleted',
+      });
+      // }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const deleteManyProduct = (ids) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await Product.deleteMany({ _id: ids });
+      resolve({
+        status: 'OK',
+        message: 'Product deleted',
       });
       // }
     } catch (e) {
@@ -118,8 +133,8 @@ const getAllProduct = (limit, page, sort, filter) => {
           .limit(limit)
           .skip(page * limit);
         resolve({
-          status: "OK",
-          message: "Success",
+          status: 'OK',
+          message: 'Success',
           data: allObjectFilter,
           total: totalProduct,
           pageCurrent: page + 1,
@@ -134,8 +149,8 @@ const getAllProduct = (limit, page, sort, filter) => {
           .skip(page * limit)
           .sort(objectSort);
         resolve({
-          status: "OK",
-          message: "Success",
+          status: 'OK',
+          message: 'Success',
           data: allProductSort,
           total: totalProduct,
           pageCurrent: page + 1,
@@ -146,8 +161,8 @@ const getAllProduct = (limit, page, sort, filter) => {
         .limit(limit)
         .skip(page * limit);
       resolve({
-        status: "OK",
-        message: "Success",
+        status: 'OK',
+        message: 'Success',
         data: allProduct,
         total: totalProduct,
         pageCurrent: page + 1,
@@ -165,4 +180,5 @@ module.exports = {
   getDetailsProduct,
   deleteProduct,
   getAllProduct,
+  deleteManyProduct,
 };

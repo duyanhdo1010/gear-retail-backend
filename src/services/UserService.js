@@ -1,7 +1,7 @@
-const User = require("../models/UserModel");
-const bcrypt = require("bcrypt");
+const User = require('../models/UserModel');
+const bcrypt = require('bcrypt');
 
-const { genneralAccessToken, genneralRefreshToken } = require("./JwtServices");
+const { genneralAccessToken, genneralRefreshToken } = require('./JwtServices');
 
 const createUser = (newUser) => {
   return new Promise(async (resolve, reject) => {
@@ -10,8 +10,8 @@ const createUser = (newUser) => {
       const checkUser = await User.findOne({ email });
       if (checkUser !== null) {
         resolve({
-          status: "ERR",
-          message: "Email already exists",
+          status: 'ERR',
+          message: 'Email already exists',
         });
       }
       const hash = await bcrypt.hash(password, 10);
@@ -23,8 +23,8 @@ const createUser = (newUser) => {
       });
       if (createdUser) {
         resolve({
-          status: "OK",
-          message: "User created successfully",
+          status: 'OK',
+          message: 'User created successfully',
           data: createdUser,
         });
       }
@@ -41,15 +41,15 @@ const loginUser = (userLogin) => {
       const checkUser = await User.findOne({ email });
       if (checkUser === null) {
         resolve({
-          status: "ERR",
-          message: "User not found",
+          status: 'ERR',
+          message: 'User not found',
         });
       }
       const comparePassword = bcrypt.compareSync(password, checkUser.password);
       if (!comparePassword) {
         resolve({
-          status: "ERR",
-          message: "The password is incorrect",
+          status: 'ERR',
+          message: 'The password is incorrect',
         });
       }
       const access_token = await genneralAccessToken({
@@ -63,8 +63,8 @@ const loginUser = (userLogin) => {
       });
 
       resolve({
-        status: "OK",
-        message: "User signed in",
+        status: 'OK',
+        message: 'User signed in',
         access_token,
         refresh_token,
       });
@@ -81,8 +81,8 @@ const updateUser = (id, data) => {
       const checkUser = await User.findOne({ _id: id });
       if (checkUser === null) {
         resolve({
-          status: "OK",
-          message: "User not found",
+          status: 'OK',
+          message: 'User not found',
         });
       }
 
@@ -90,8 +90,8 @@ const updateUser = (id, data) => {
         new: true,
       });
       resolve({
-        status: "OK",
-        message: "User updated successfully",
+        status: 'OK',
+        message: 'User updated successfully',
         data: updatedUser,
       });
       // }
@@ -107,15 +107,30 @@ const deleteUser = (id) => {
       const checkUser = await User.findOne({ _id: id });
       if (checkUser === null) {
         resolve({
-          status: "OK",
-          message: "User not found",
+          status: 'OK',
+          message: 'User not found',
         });
       }
 
       await User.findByIdAndDelete(id);
       resolve({
-        status: "OK",
-        message: "User deleted",
+        status: 'OK',
+        message: 'User deleted',
+      });
+      // }
+    } catch (e) {
+      reject(e);
+    }
+  });
+};
+
+const deleteManyUser = (ids) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await User.deleteMany({ _id: ids });
+      resolve({
+        status: 'OK',
+        message: 'User deleted',
       });
       // }
     } catch (e) {
@@ -129,8 +144,8 @@ const getAllUser = () => {
     try {
       const allUser = await User.find();
       resolve({
-        status: "OK",
-        message: "Success",
+        status: 'OK',
+        message: 'Success',
         data: allUser,
       });
       // }
@@ -144,16 +159,16 @@ const getDetailsUser = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
       const user = await User.findOne({ _id: id });
-      console.log("user: ", user);
+      console.log('user: ', user);
       if (user === null) {
         resolve({
-          status: "OK",
-          message: "User not found",
+          status: 'OK',
+          message: 'User not found',
         });
       }
       resolve({
-        status: "OK",
-        message: "SUCCESS",
+        status: 'OK',
+        message: 'SUCCESS',
         data: user,
       });
       // }
@@ -170,4 +185,5 @@ module.exports = {
   deleteUser,
   getAllUser,
   getDetailsUser,
+  deleteManyUser,
 };

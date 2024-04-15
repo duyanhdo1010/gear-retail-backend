@@ -1,5 +1,5 @@
-const UserService = require("../services/UserService");
-const JwtService = require("../services/JwtServices");
+const UserService = require('../services/UserService');
+const JwtService = require('../services/JwtServices');
 
 const createUser = async (req, res) => {
   try {
@@ -8,18 +8,18 @@ const createUser = async (req, res) => {
     const isCheckEmail = reg.test(email);
     if (!email || !password || !confirmPassword) {
       return res.status(200).json({
-        status: "ERR",
-        message: "All fields are required",
+        status: 'ERR',
+        message: 'All fields are required',
       });
     } else if (!isCheckEmail) {
       return res.status(200).json({
-        status: "ERR",
-        message: "Invalid email",
+        status: 'ERR',
+        message: 'Invalid email',
       });
     } else if (password !== confirmPassword) {
       return res.status(200).json({
-        status: "ERR",
-        message: "Password and confirm password are not match",
+        status: 'ERR',
+        message: 'Password and confirm password are not match',
       });
     }
     const response = await UserService.createUser(req.body);
@@ -38,22 +38,22 @@ const loginUser = async (req, res) => {
     const isCheckEmail = reg.test(email);
     if (!email || !password) {
       return res.status(200).json({
-        status: "ERR",
-        message: "All fields are required",
+        status: 'ERR',
+        message: 'All fields are required',
       });
     } else if (!isCheckEmail) {
       return res.status(200).json({
-        status: "ERR",
-        message: "Invalid email",
+        status: 'ERR',
+        message: 'Invalid email',
       });
     }
     const response = await UserService.loginUser(req.body);
     const { refresh_token, ...newResponse } = response;
     // console.log("response", response);
-    res.cookie("refresh_token", refresh_token, {
+    res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
       secure: false,
-      samesite: "strict",
+      samesite: 'strict',
     });
     return res.status(200).json(newResponse);
   } catch (e) {
@@ -69,8 +69,8 @@ const updateUser = async (req, res) => {
     const data = req.body;
     if (!userId) {
       return res.status(200).json({
-        status: "ERR",
-        message: "User id is required",
+        status: 'ERR',
+        message: 'User id is required',
       });
     }
     const response = await UserService.updateUser(userId, data);
@@ -87,11 +87,29 @@ const deleteUser = async (req, res) => {
     const userId = req.params.id;
     if (!userId) {
       return res.status(200).json({
-        status: "ERR",
-        message: "User id is required",
+        status: 'ERR',
+        message: 'User id is required',
       });
     }
     const response = await UserService.deleteUser(userId);
+    return res.status(200).json(response);
+  } catch (e) {
+    return res.status(404).json({
+      message: `Controller: ${e}`,
+    });
+  }
+};
+
+const deleteMany = async (req, res) => {
+  try {
+    const ids = req.body.ids;
+    if (!ids) {
+      return res.status(200).json({
+        status: 'ERR',
+        message: 'ids is required',
+      });
+    }
+    const response = await UserService.deleteManyUser(ids);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({
@@ -116,8 +134,8 @@ const getDetailsUser = async (req, res) => {
     const userId = req.params.id;
     if (!userId) {
       return res.status(200).json({
-        status: "ERR",
-        message: "User id is required",
+        status: 'ERR',
+        message: 'User id is required',
       });
     }
     const response = await UserService.getDetailsUser(userId);
@@ -130,13 +148,13 @@ const getDetailsUser = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  console.log("req.cookies.refresh_token: ", req.cookies.refresh_token);
+  console.log('req.cookies.refresh_token: ', req.cookies.refresh_token);
   try {
     const token = req.cookies.refresh_token;
     if (!token) {
       return res.status(200).json({
-        status: "ERR",
-        message: "Token is required",
+        status: 'ERR',
+        message: 'Token is required',
       });
     }
     const response = await JwtService.refreshTokenJwtService(token);
@@ -150,12 +168,12 @@ const refreshToken = async (req, res) => {
 };
 
 const logoutUser = async (req, res) => {
-  console.log("req.cookies.refresh_token: ", req.cookies.refresh_token);
+  console.log('req.cookies.refresh_token: ', req.cookies.refresh_token);
   try {
-    res.clearCookie("refresh_token");
+    res.clearCookie('refresh_token');
     return res.status(200).json({
-      status: "OK",
-      message: "Logout successfully",
+      status: 'OK',
+      message: 'Logout successfully',
     });
   } catch (e) {
     return res.status(404).json({
@@ -173,4 +191,5 @@ module.exports = {
   getDetailsUser,
   refreshToken,
   logoutUser,
+  deleteMany,
 };
