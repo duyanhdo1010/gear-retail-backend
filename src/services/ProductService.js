@@ -3,8 +3,16 @@ const bcrypt = require('bcrypt');
 
 const createProduct = (newProduct) => {
   return new Promise(async (resolve, reject) => {
-    const { name, image, type, countInStock, price, rating, description } =
-      newProduct;
+    const {
+      name,
+      image,
+      type,
+      countInStock,
+      price,
+      rating,
+      description,
+      discount,
+    } = newProduct;
 
     try {
       const checkProduct = await Product.findOne({ name: name });
@@ -22,6 +30,7 @@ const createProduct = (newProduct) => {
         price,
         rating,
         description,
+        discount,
       });
       if (newProduct) {
         resolve({
@@ -125,7 +134,8 @@ const deleteManyProduct = (ids) => {
 const getAllProduct = (limit, page, sort, filter) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const totalProduct = await Product.countDocuments();
+      const totalProduct = await Product.estimatedDocumentCount();
+      let allProduct = [];
       if (filter) {
         const allObjectFilter = await Product.find({
           [filter[0]]: { $regex: filter[1] },
@@ -157,9 +167,13 @@ const getAllProduct = (limit, page, sort, filter) => {
           totalPage: Math.ceil(totalProduct / limit),
         });
       }
-      const allProduct = await Product.find()
-        .limit(limit)
-        .skip(page * limit);
+      if (!limit) {
+        allProduct = await Product.find();
+      } else {
+        allProduct = await Product.find()
+          .limit(limit)
+          .skip(page * limit);
+      }
       resolve({
         status: 'OK',
         message: 'Success',
