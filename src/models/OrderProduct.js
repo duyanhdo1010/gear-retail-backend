@@ -8,6 +8,7 @@ const orderSchema = new mongoose.Schema(
         amount: { type: Number, required: true },
         image: { type: String, required: true },
         price: { type: Number, required: true },
+        discount: { type: Number },
         product: {
           //join bang product vao order
           type: mongoose.Schema.Types.ObjectId,

@@ -58,7 +58,6 @@ const getAllOrderDetails = async (req, res) => {
 
 const getDetailsOrder = async (req, res) => {
   try {
-    console.log('req.body', req.body);
     const userId = req.params.id;
     if (!userId) {
       return res.status(200).json({
@@ -78,12 +77,12 @@ const getDetailsOrder = async (req, res) => {
 
 const cancelOrderDetails = async (req, res) => {
   try {
-    const data = req.body.orderItems;
-    const orderId = req.body.orderId;
+    const orderId = req.params.id;
+    const data = req.body;
     if (!orderId) {
       return res.status(200).json({
         status: 'ERR',
-        message: 'The orderId is required',
+        message: 'The userId is required',
       });
     }
     const response = await OrderService.cancelOrderDetails(orderId, data);

@@ -14,6 +14,8 @@ const createOrder = (newOrder) => {
       city,
       phone,
       user,
+      isPaid,
+      paidAt,
     } = newOrder;
     try {
       const promises = orderItems.map(async (order) => {
@@ -25,35 +27,12 @@ const createOrder = (newOrder) => {
           {
             $inc: {
               countInStock: -order.amount,
-              // selled: +quality
               selled: +order.amount,
             },
           },
           { new: true }
         );
-        console.log('productData: ', productData);
-        if (productData) {
-          const createdOrder = await Order.create({
-            orderItems,
-            shippingAddress: {
-              fullName,
-              address,
-              city,
-              phone,
-            },
-            paymentMethod,
-            itemsPrice,
-            shippingPrice,
-            totalPrice,
-            user: user,
-          });
-          if (createdOrder) {
-            return {
-              status: 'OK',
-              message: 'Success',
-            };
-          }
-        } else {
+        if (!productData) {
           return {
             status: 'OK',
             message: 'ERR',
@@ -62,19 +41,38 @@ const createOrder = (newOrder) => {
         }
       });
       const results = await Promise.all(promises);
-      const newData = results && results.filter((item) => item.id);
+      const newData = results && results.filter((item) => item && item.id);
       if (newData.length) {
         resolve({
           status: 'ERR',
-          message: `San pham voi id ${newData.join(
-            ','
-          )} khong du so luong ton kho`,
+          message: `San pham voi id${newData.join(',')} khong du hang`,
         });
+        return;
       }
-      resolve({
-        status: 'OK',
-        message: 'success',
+      const createdOrder = await Order.create({
+        orderItems,
+        shippingAddress: {
+          fullName,
+          address,
+          city,
+          phone,
+        },
+        paymentMethod,
+        itemsPrice,
+        shippingPrice,
+        totalPrice,
+        user: user,
+        isPaid,
+        paidAt,
       });
+      if (createdOrder) {
+        resolve({
+          status: 'OK',
+          message: 'SUCCESS',
+        });
+      } else {
+        reject('Order creation failed');
+      }
     } catch (e) {
       console.log('e', e);
       reject(e);
@@ -91,15 +89,17 @@ const getAllOrderDetails = (id) => {
       if (order === null) {
         resolve({
           status: 'ERR',
-          message: ' Sản phẩm không xác định',
+          message: 'The order is not defined',
         });
       }
+
       resolve({
         status: 'OK',
-        message: 'SUCCESS',
+        message: 'SUCESSS',
         data: order,
       });
     } catch (e) {
+      console.log('e', e);
       reject(e);
     }
   });
@@ -108,8 +108,8 @@ const getAllOrderDetails = (id) => {
 const getDetailsOrder = (id) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const order = await Order.findOne({
-        user: id,
+      const order = await Order.findById({
+        _id: id,
       });
       if (order === null) {
         resolve({
@@ -148,12 +148,13 @@ const cancelOrderDetails = (id, data) => {
           },
           { new: true }
         );
+        console.log('productData', productData);
         if (productData) {
           order = await Order.findByIdAndDelete(id);
           if (order === null) {
             resolve({
               status: 'ERR',
-              message: ' Sản phẩm không xác định',
+              message: 'The order is not defined',
             });
           }
         } else {
@@ -165,12 +166,11 @@ const cancelOrderDetails = (id, data) => {
         }
       });
       const results = await Promise.all(promises);
-      const newData = results && results[0] && results[0].id;
-
-      if (newData) {
+      const newData = results && results.filter((item) => item);
+      if (newData.length) {
         resolve({
           status: 'ERR',
-          message: `Sản phẩm không tồn tại`,
+          message: `San pham voi id ${newData.join(',')} khong ton tai`,
         });
       }
       resolve({
