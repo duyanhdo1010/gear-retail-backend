@@ -21,4 +21,7 @@ router.delete(
   OrderController.cancelOrderDetails
 );
 
+router.delete('/delete-order/:id', OrderController.DeleteOrders);
+router.put('/update/:id', OrderController.updateOrder);
+
 module.exports = router;
