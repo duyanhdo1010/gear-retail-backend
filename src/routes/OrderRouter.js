@@ -9,6 +9,7 @@ router.get(
   authUserMiddleware,
   OrderController.getAllOrderDetails
 );
+router.get('/get-all-order', authUserMiddleware, OrderController.getAllOrder);
 router.get(
   '/get-details-order/:id',
   authUserMiddleware,
