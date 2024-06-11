@@ -20,7 +20,7 @@ const orderSchema = new mongoose.Schema(
     shippingAddress: {
       fullName: { type: String, required: true },
       address: { type: String, required: true },
-      city: { type: String, required: true },
+      // city: { type: String, required: true },
       phone: { type: String, required: true },
     },
     paymentMethod: { type: String, required: true },
@@ -42,5 +42,16 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+orderSchema.methods.checkProductInOrder = function (productId) {
+  return this.orderItems.some(
+    (item) => item.product.toString() === productId.toString()
+  );
+};
+
+orderSchema.methods.checkUserInOrder = function (userId) {
+  return this.user.toString() === userId.toString();
+};
+
 const Order = mongoose.model('Order', orderSchema);
 module.exports = Order;

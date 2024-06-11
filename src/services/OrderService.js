@@ -12,7 +12,7 @@ const createOrder = (newOrder) => {
       totalPrice,
       fullName,
       address,
-      city,
+      // city,
       phone,
       user,
       isPaid,
@@ -64,7 +64,7 @@ const createOrder = (newOrder) => {
           shippingAddress: {
             fullName,
             address,
-            city,
+            // city,
             phone,
           },
           paymentMethod,
@@ -76,7 +76,12 @@ const createOrder = (newOrder) => {
           paidAt,
         });
         if (createdOrder) {
-          await EmailService.sendEmailCreateOrder(email, orderItems);
+          await EmailService.sendEmailCreateOrder(
+            email,
+            orderItems,
+            totalPrice,
+            createdOrder._id // Send the order id
+          );
           resolve({
             status: 'OK',
             message: 'success',
@@ -125,7 +130,6 @@ const getDetailsOrder = (id) => {
           message: ' Order không xác định',
         });
       }
-
       resolve({
         status: 'OK',
         message: 'SUCESSS',

@@ -9,7 +9,7 @@ const createOrder = async (req, res) => {
       totalPrice,
       fullName,
       address,
-      city,
+      // city,
       phone,
       // isPaid,
       // paidAt,
@@ -20,7 +20,7 @@ const createOrder = async (req, res) => {
       !totalPrice ||
       !fullName ||
       !address ||
-      !city ||
+      // !city ||
       !phone
     ) {
       return res.status(200).json({
@@ -57,14 +57,14 @@ const getAllOrderDetails = async (req, res) => {
 
 const getDetailsOrder = async (req, res) => {
   try {
-    const userId = req.params.id;
-    if (!userId) {
+    const orderId = req.params.id;
+    if (!orderId) {
       return res.status(200).json({
         status: 'ERR',
-        message: 'The userId is required',
+        message: 'The orderId is required',
       });
     }
-    const response = await OrderService.getDetailsOrder(userId);
+    const response = await OrderService.getDetailsOrder(orderId);
     return res.status(200).json(response);
   } catch (e) {
     return res.status(404).json({

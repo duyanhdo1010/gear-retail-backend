@@ -3,7 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 var inlineBase64 = require('nodemailer-plugin-inline-base64');
 
-const sendEmailCreateOrder = async (email, orderItems) => {
+const sendEmailCreateOrder = async (email, orderItems, totalPrice, orderId) => {
   let transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -20,8 +20,7 @@ const sendEmailCreateOrder = async (email, orderItems) => {
   orderItems.forEach((order) => {
     listItem += `<div>
     <div>
-      Bạn đã đặt sản phẩm <b>${order.name}</b> với số lượng: <b>${order.amount}</b> và giá là: <b>${order.price}đ</b></div>
-      <div>Bên dưới là hình ảnh của sản phẩm</div>
+      Bạn đã đặt sản phẩm <b>${order.name}</b> với số lượng: <b>${order.amount}</b> và giá trên từng sản phẩm là: <b style="color: red;"> ${order.price}đ</b></div>
     </div>`;
     attachImage.push({ path: order.image });
   });
@@ -32,7 +31,11 @@ const sendEmailCreateOrder = async (email, orderItems) => {
     to: process.env.MAIL_ACCOUNT, // list of receivers
     subject: 'Bạn đã đặt hàng tại GEAR RETAIL', // Subject line
     text: 'Hello world?', // plain text body
-    html: `<div><b>Bạn đã đặt hàng thành công tại GEAR RETAIL</b></div> ${listItem}`,
+    html: `<div><b>Bạn đã đặt hàng thành công tại GEAR RETAIL với mã đơn hàng là ${orderId}</b></div> 
+    ${listItem}
+    <div>Bên dưới là hình ảnh của sản phẩm</div>
+    <div>Tổng tiền phải thanh toán là: <b style="color: red">${totalPrice}đ</b></div>
+    `,
     attachments: attachImage,
   });
 };

@@ -1,5 +1,6 @@
 const UserService = require('../services/UserService');
 const JwtService = require('../services/JwtServices');
+const Order = require('../models/OrderProduct');
 
 const createUser = async (req, res) => {
   try {
@@ -89,6 +90,15 @@ const deleteUser = async (req, res) => {
         status: 'ERR',
         message: 'User id is required',
       });
+    }
+    const orders = await Order.find({});
+    for (let i = 0; i < orders.length; i++) {
+      if (orders[i].checkUserInOrder(userId)) {
+        return res.status(400).json({
+          status: 'ERR',
+          message: 'User này đã tồn tại trong 1 order',
+        });
+      }
     }
     const response = await UserService.deleteUser(userId);
     return res.status(200).json(response);

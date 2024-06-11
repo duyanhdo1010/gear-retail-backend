@@ -1,3 +1,4 @@
+const Order = require('../models/OrderProduct');
 const Product = require('../models/ProductModel');
 const ProductService = require('../services/ProductService');
 
@@ -82,6 +83,16 @@ const deleteProduct = async (req, res) => {
         message: 'productId is required',
       });
     }
+    const orders = await Order.find({});
+    for (let i = 0; i < orders.length; i++) {
+      if (orders[i].checkProductInOrder(productId)) {
+        return res.status(400).json({
+          status: 'ERR',
+          message: 'Sản phẩm này đã tồn tại trong 1 order',
+        });
+      }
+    }
+
     const response = await ProductService.deleteProduct(productId);
     return res.status(200).json(response);
   } catch (e) {

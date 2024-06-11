@@ -142,7 +142,7 @@ const deleteManyUser = (ids) => {
 const getAllUser = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const allUser = await User.find();
+      const allUser = await User.find({ isAdmin: false });
       resolve({
         status: 'OK',
         message: 'Success',
