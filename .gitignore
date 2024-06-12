@@ -94,3 +94,5 @@ dist
 
 # DynamoDB Local files
 .dynamodb/
+
+.env
